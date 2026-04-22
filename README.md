@@ -4,13 +4,27 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### 1. Clone the repository
+```bash
+git clone https://github.com/dev-abdul-haseeb/spend_wise.git
+cd spend_wise
+```
 
-A few resources to get you started if this is your first Flutter project:
+### 2. Install dependencies
+```bash
+flutter pub get
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 3. Setup Firebase
+- Create a project at [Firebase Console](https://console.firebase.google.com/)
+- Run the Firebase CLI setup commands
+- Enable **Email/Password** authentication in Firebase Console
+- Enable **Cloud Firestore** in Firebase Console
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 4. Get SHA Keys (Android)
+```bash
+cd android
+./gradlew signingReport
+```
+Add the SHA-1 and SHA-256 keys to your Firebase Android app settings.
+
