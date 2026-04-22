@@ -199,7 +199,7 @@ class _AppButtonState extends State<AppButton>
                 ],
                 Text(
                   widget.text,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.dmSans(
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
                     color: widget.color,
