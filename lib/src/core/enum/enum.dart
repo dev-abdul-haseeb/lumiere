@@ -15,3 +15,10 @@ enum appColors{
   out_of_stock_text,
   active_stock_text,
 }
+
+enum orderStatus {
+  accepted,
+  shipped,
+  completed,
+  cancelled
+}
