@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "670300356353",
+    "project_id": "lumiere-a960e",
+    "storage_bucket": "lumiere-a960e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670300356353:android:cf4858a75c3dcca9fe2500",
+        "android_client_info": {
+          "package_name": "com.example.lumiere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1wHwhYeIqYwxntGLki1-ZMFIdNc_8rS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
