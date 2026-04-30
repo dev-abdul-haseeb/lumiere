@@ -12,7 +12,20 @@
           "package_name": "com.example.lumiere"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "670300356353-okar7guhvomm3it58q3rne68vodjq17g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lumiere",
+            "certificate_hash": "3389e6fa2bf8a9c98627df1e9ebfe9f3fac59e2a"
+          }
+        },
+        {
+          "client_id": "670300356353-suvi1qptghc93nua4ee4bnsvf2oivpvt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD1wHwhYeIqYwxntGLki1-ZMFIdNc_8rS8"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670300356353-suvi1qptghc93nua4ee4bnsvf2oivpvt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "670300356353-sijdc54kuq5l3hms172b3368iug8arov.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.lumiere"
+              }
+            }
+          ]
         }
       }
     }
