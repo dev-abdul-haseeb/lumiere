@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
                       Center(
                         child: AppButton(
-                          'Sign in with Google',
+                          'Continue with Google',
                           leadingIcon: Icons.g_mobiledata,
                           onPressed: () {
                             context.read<AuthBloc>().add(SignInWithGmailRequested());
