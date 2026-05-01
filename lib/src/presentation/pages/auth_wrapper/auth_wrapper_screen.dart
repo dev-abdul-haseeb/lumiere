@@ -53,9 +53,12 @@ class _AuthWrapperScreenState extends State<AuthWrapperScreen> {
             if(state.user.first_name == '') {
               return DataEntryScreen(user: state.user);
             }
-            return state.user.is_admin
-                ? const AdminHomeScreen()
+            else {
+              String name = state.user.first_name + ' ' + state.user.last_name;
+              return state.user.is_admin
+                ? AdminHomeScreen(admin_name: name)
                 : const BuyerHomeScreen();
+            }
           }
           return const LoginScreen();
         },
