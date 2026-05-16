@@ -74,6 +74,7 @@ Local Storage: Shared Preferences
 14. app_settings
 15. supabase_flutter
 16. image_picker
+17. uuid
 
 ### Google sign in setup:
 Add this code to android/build.gradle.kts:

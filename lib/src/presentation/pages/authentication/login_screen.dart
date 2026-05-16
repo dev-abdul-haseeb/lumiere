@@ -8,6 +8,7 @@ import 'package:lumiere/src/presentation/pages/authentication/password_reset_scr
 import 'package:lumiere/src/presentation/pages/authentication/signup_screen.dart';
 import 'package:lumiere/src/presentation/widgets/textwidgets.dart';
 
+import '../../blocs/application/application_bloc.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/button.dart';
 import '../../widgets/flash_bar.dart';  // showFlashbar
@@ -124,70 +125,75 @@ class _LoginScreenState extends State<LoginScreen> {
   // Header
 
   Widget _buildHeader() {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 24,
-        left: 24,
-        right: 24,
-        bottom: 32,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return BlocBuilder<ApplicationBloc, ApplicationState>(
+      builder: (context, state) {
+        final appName = state is ApplicationLoaded ? state.application.name.toUpperCase() : AppConstants.appName;
+        return Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 24,
+            left: 24,
+            right: 24,
+            bottom: 32,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: _highlight, width: 1.5),
-                ),
-                child: Center(
-                  child: Text(
-                    'L',
-                    style: GoogleFonts.cormorantGaramond(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: _highlight,
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: _highlight, width: 1.5),
+                    ),
+                    child: Center(
+                      child: Text(
+                        appName.isNotEmpty ? appName[0] : 'L',  // first letter dynamically
+                        style: GoogleFonts.cormorantGaramond(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          color: _highlight,
+                        ),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 10),
+                  Text(
+                    appName,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      letterSpacing: 3.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              Text(
+                'Welcome\nback',
+                style: GoogleFonts.cormorantGaramond(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w300,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.white,
+                  height: 1.1,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(height: 8),
               Text(
-                AppConstants.appName,
+                'Sign in to your account',
                 style: GoogleFonts.dmSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                  letterSpacing: 3.5,
+                  fontSize: 13,
+                  color: _highlight,
+                  letterSpacing: 0.3,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 28),
-          Text(
-            'Welcome\nback',
-            style: GoogleFonts.cormorantGaramond(
-              fontSize: 44,
-              fontWeight: FontWeight.w300,
-              fontStyle: FontStyle.italic,
-              color: Colors.white,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Sign in to your account',
-            style: GoogleFonts.dmSans(
-              fontSize: 13,
-              color: _highlight,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
