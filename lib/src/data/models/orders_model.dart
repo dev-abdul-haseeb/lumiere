@@ -11,6 +11,7 @@ class OrdersModel extends Orders {
     required super.address_id,
     required super.dateTime,
     required super.status,
+    required super.shipment_cost,
   });
 
   OrdersModel copyWith({
@@ -19,6 +20,7 @@ class OrdersModel extends Orders {
     String? address_id,
     DateTime? dateTime,
     orderStatus? status,
+    double? shipment_cost,
   }) {
     return OrdersModel(
       order_id: order_id ?? this.order_id,
@@ -26,6 +28,7 @@ class OrdersModel extends Orders {
       address_id: address_id ?? this.address_id,
       dateTime: dateTime ?? this.dateTime,
       status: status ?? this.status,
+      shipment_cost: shipment_cost ?? this.shipment_cost,
     );
   }
 }

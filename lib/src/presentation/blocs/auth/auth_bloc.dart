@@ -184,7 +184,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _forgetPasswordRequested(ForgetPasswordRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     authRepo.sendPasswordResetEmail(event.email);
-    emit(AuthUnAuthenticated());
+    add(AuthLogOut());
+
   }
 
   Future<void> _logOutUser (AuthLogOut event, Emitter<AuthState> emit) async {
