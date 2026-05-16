@@ -6,6 +6,7 @@ class AppConstants {
   static const String appSubtitle             = 'LUXURY SKINCARE';
   // Firestore collection names
   static const String userCollection          = 'user';
+  static const String applicationCollection   = 'application';
   static const String cartCollection          = 'cart';
   static const String cartItemsCollection     = 'cart_items';
   static const String reviewsCollection       = 'reviews';

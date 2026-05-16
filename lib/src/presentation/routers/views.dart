@@ -15,3 +15,7 @@ export 'package:lumiere/src/presentation/pages/admin/admin_settings_screen/admin
 
 //Buyer
 export 'package:lumiere/src/presentation/pages/buyer/home_screen/buyer_home_screen.dart';
+export 'package:lumiere/src/presentation/pages/buyer/buyer_mainmenu_screen/buyer_mainmenu_screen.dart';
+export 'package:lumiere/src/presentation/pages/buyer/buyer_cart_screen/buyer_cart_screen.dart';
+export 'package:lumiere/src/presentation/pages/buyer/buyer_orders_screen/buyer_orders_screen.dart';
+export 'package:lumiere/src/presentation/pages/buyer/buyer_profile_screen/buyer_profile_screen.dart';

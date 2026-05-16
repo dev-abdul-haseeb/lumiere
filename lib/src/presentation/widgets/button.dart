@@ -2,17 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-enum ButtonType {
-  primary,    // Filled - main actions
-  secondary,  // Outlined - secondary actions
-  ghost,      // Text only - subtle actions
-  danger,     // Red - destructive actions
-}
+/// Button types observed across all Lumière screens.
+///
+///  [primary]    Filled dark — "SIGN IN", "PUBLISH", "ADD TO BAG", "PROCEED TO CHECKOUT"
+///  [secondary]  Outlined    — "SAVE DRAFT", "Change password", "Reset store"
+///  [ghost]      Text only   — subtle inline actions, nav items
+///  [social]     Bordered cream card — Facebook / Google login buttons
+///  [danger]     Red-tinted border  — destructive actions in danger zone
+enum ButtonType { primary, secondary, ghost, social, danger }
 
-enum ButtonSize {
-  small,
-  medium,
-  large,
+/// Button sizes observed across screens.
+///
+///  [small]   Filter chips, status pills, inline actions   (~36 h)
+///  [medium]  Standard form actions, admin table buttons   (~48 h)
+///  [large]   Full-width CTA — Sign In, Publish, Checkout  (~52 h)
+enum ButtonSize { small, medium, large }
+
+// Lumière palette
+class _C {
+  static const dark       = Color(0xFF2C2C2C);
+  static const cream      = Color(0xFFF5F0E8);
+  static const card       = Color(0xFFFAF7F2);
+  static const border     = Color(0xFFD4CFC7);
+  static const gold       = Color(0xFFC9A96E);
+  static const olive      = Color(0xFF6B7C4A);
+  static const dangerText = Color(0xFF791F1F);
+  static const dangerBg   = Color(0xFFFCEBEB);
+  static const dangerBdr  = Color(0xFFE8C5C5);
 }
 
 class AppButton extends StatefulWidget {
@@ -20,21 +36,25 @@ class AppButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final ButtonType type;
   final ButtonSize size;
-  final Color color;
-  final Color bgcolor;
+  final Color? color;
+  final Color? bgcolor;
+
   final IconData? leadingIcon;
   final IconData? trailingIcon;
   final bool isLoading;
+
+  /// true  → stretch to type-aware width (primary = 88 %, others = 60 %)
+  /// false → shrink-wrap content (icon buttons, chips)
   final bool fullWidth;
 
   const AppButton(
       this.text, {
         super.key,
         this.onPressed,
-        this.type = ButtonType.primary,
-        this.size = ButtonSize.medium,
-        required this.color,
-        required this.bgcolor,
+        this.type    = ButtonType.primary,
+        this.size    = ButtonSize.medium,
+        this.color,
+        this.bgcolor,
         this.leadingIcon,
         this.trailingIcon,
         this.isLoading = false,
@@ -47,168 +67,195 @@ class AppButton extends StatefulWidget {
 
 class _AppButtonState extends State<AppButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+  late final AnimationController _ctrl;
+  late final Animation<double>   _scale;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 100),
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _ctrl  = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
+    _scale = Tween<double>(begin: 1.0, end: 0.96)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
-  void _onTapDown(_) {
+  void _down(_) {
     if (widget.onPressed != null && !widget.isLoading) {
-      _controller.forward();
+      _ctrl.forward();
       HapticFeedback.lightImpact();
     }
   }
+  void _up(_)     => _ctrl.reverse();
+  void _cancel()  => _ctrl.reverse();
 
-  void _onTapUp(_) => _controller.reverse();
-  void _onTapCancel() => _controller.reverse();
+  // Sizing
 
-  // Responsive sizing
-  double _getResponsiveHeight(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double scale = width / 375;
-
+  double _height(BuildContext ctx) {
+    final s = MediaQuery.of(ctx).size.width / 375;
     switch (widget.size) {
-      case ButtonSize.small:
-        return (36 * scale).clamp(36, 44);
-      case ButtonSize.medium:
-        return (40 * scale).clamp(48, 56);
-      case ButtonSize.large:
-        return (48 * scale).clamp(48, 56);
+      case ButtonSize.small:  return (36 * s).clamp(32, 40);
+      case ButtonSize.medium: return (44 * s).clamp(44, 52);
+      case ButtonSize.large:  return (52 * s).clamp(50, 58);
     }
   }
 
-  double _getFontSize(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double scale = width / 375;
-
+  double _fontSize(BuildContext ctx) {
+    final s = MediaQuery.of(ctx).size.width / 375;
     switch (widget.size) {
-      case ButtonSize.small:
-        return (15 * scale).clamp(15, 19);
-      case ButtonSize.medium:
-        return (17 * scale).clamp(17, 21);
-      case ButtonSize.large:
-        return (21 * scale).clamp(21, 25);
+      case ButtonSize.small:  return (11 * s).clamp(11, 13);
+      case ButtonSize.medium: return (13 * s).clamp(13, 15);
+      case ButtonSize.large:  return (13 * s).clamp(13, 15);
     }
   }
 
-  EdgeInsets _getPadding() {
+  double _iconSize() {
     switch (widget.size) {
-      case ButtonSize.small:
-        return EdgeInsets.symmetric(horizontal: 14, vertical: 4);
-      case ButtonSize.medium:
-        return EdgeInsets.symmetric(horizontal: 18, vertical: 5);
-      case ButtonSize.large:
-        return EdgeInsets.symmetric(horizontal: 20, vertical: 6);
+      case ButtonSize.small:  return 16;
+      case ButtonSize.medium: return 18;
+      case ButtonSize.large:  return 20;
     }
   }
 
-  double _getIconSize() {
+  EdgeInsets _padding() {
     switch (widget.size) {
-      case ButtonSize.small:  return 18;
-      case ButtonSize.medium: return 20;
-      case ButtonSize.large:  return 22;
+      case ButtonSize.small:  return const EdgeInsets.symmetric(horizontal: 12, vertical: 4);
+      case ButtonSize.medium: return const EdgeInsets.symmetric(horizontal: 18, vertical: 6);
+      case ButtonSize.large:  return const EdgeInsets.symmetric(horizontal: 20, vertical: 8);
     }
   }
 
+  double _width(double screenW) {
+    if (!widget.fullWidth) return double.nan; // shrink-wrap via MainAxisSize.min
+    if (screenW > 600) {
+      return widget.type == ButtonType.primary ? 420 : 300;
+    }
+    return widget.type == ButtonType.primary ? screenW * 0.88 : screenW * 0.62;
+  }
 
-  Border? _getBorder() {
+  // Per-type defaults
+
+  Color _fgColor() {
+    if (widget.color != null) return widget.color!;
     switch (widget.type) {
-      case ButtonType.secondary:
-        return Border.all(
-          color: widget.color!,
-          width: 1.5,
-        );
-      default:
-        return null;
+      case ButtonType.primary:   return Colors.white;
+      case ButtonType.secondary: return _C.dark;
+      case ButtonType.ghost:     return _C.dark;
+      case ButtonType.social:    return _C.dark;
+      case ButtonType.danger:    return _C.dangerText;
     }
   }
+
+  Color _bgColor() {
+    if (widget.bgcolor != null) return widget.bgcolor!;
+    switch (widget.type) {
+      case ButtonType.primary:   return _C.dark;
+      case ButtonType.secondary: return Colors.transparent;
+      case ButtonType.ghost:     return Colors.transparent;
+      case ButtonType.social:    return _C.card;
+      case ButtonType.danger:    return _C.dangerBg;
+    }
+  }
+
+  Border? _border() {
+    switch (widget.type) {
+      case ButtonType.secondary: return Border.all(color: _C.dark,      width: 1.5);
+      case ButtonType.social:    return Border.all(color: _C.border,    width: 1.0);
+      case ButtonType.danger:    return Border.all(color: _C.dangerBdr, width: 1.0);
+      default:                   return null;
+    }
+  }
+
+  List<BoxShadow>? _shadow(bool disabled) {
+    if (disabled || widget.type != ButtonType.primary) return null;
+    return [
+      BoxShadow(
+        color: _C.dark.withOpacity(0.25),
+        blurRadius: 12,
+        offset: const Offset(0, 6),
+      ),
+    ];
+  }
+
+  double _letterSpacing() {
+    // Caps-spaced text for primary/secondary, tighter for social/ghost
+    switch (widget.type) {
+      case ButtonType.primary:
+      case ButtonType.secondary:
+        return widget.size == ButtonSize.small ? 1.2 : 2.0;
+      default:
+        return 0.3;
+    }
+  }
+
+  // Build
 
   @override
   Widget build(BuildContext context) {
-    final height = _getResponsiveHeight(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final fontSize = _getFontSize(context);
-    final isDisabled = widget.onPressed == null;
+    final screenW  = MediaQuery.of(context).size.width;
+    final h        = _height(context);
+    final fs       = _fontSize(context);
+    final disabled = widget.onPressed == null;
+    final fg       = _fgColor();
+    final w        = _width(screenW);
+    final useMaxW  = widget.fullWidth;
 
     return GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
-      onTap: (!isDisabled && !widget.isLoading) ? widget.onPressed : null,
+      onTapDown:   _down,
+      onTapUp:     _up,
+      onTapCancel: _cancel,
+      onTap: (!disabled && !widget.isLoading) ? widget.onPressed : null,
       child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        ),
+        animation: _scale,
+        builder: (_, child) => Transform.scale(scale: _scale.value, child: child),
         child: AnimatedOpacity(
-          duration: Duration(milliseconds: 200),
-          opacity: isDisabled ? 0.5 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          opacity: disabled ? 0.45 : 1.0,
           child: Container(
-            height: height,
-            width: screenWidth > 600 ? 300 : screenWidth * 0.6,
-            padding: _getPadding(),
+            height: h,
+            width:  useMaxW ? w : null,
+            padding: _padding(),
             decoration: BoxDecoration(
-              color: widget.bgcolor,
+              color:        _bgColor(),
               borderRadius: BorderRadius.circular(12),
-              border: _getBorder(),
-              boxShadow: (widget.type == ButtonType.primary && !isDisabled)
-                  ? [
-                BoxShadow(
-                  color: widget.color,
-                  blurRadius: 12,
-                  offset: Offset(0, 7),
-                )
-              ]
-                  : null,
+              border:       _border(),
+              boxShadow:    _shadow(disabled),
             ),
             child: widget.isLoading
                 ? Center(
               child: SizedBox(
-                height: height * 0.4,
-                width: height * 0.4,
+                height: h * 0.38,
+                width:  h * 0.38,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: widget.color,
+                  color: fg,
                 ),
               ),
             )
                 : Row(
-              mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
+              mainAxisSize:      useMaxW ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (widget.leadingIcon != null) ...[
-                  Icon(widget.leadingIcon, size: _getIconSize(), color: widget.color, fontWeight: FontWeight.bold,),
-                  SizedBox(width: 8),
+                  Icon(widget.leadingIcon,  size: _iconSize(), color: fg),
+                  const SizedBox(width: 8),
                 ],
                 Text(
                   widget.text,
                   style: GoogleFonts.dmSans(
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                    color: widget.color,
-                    letterSpacing: 0.3,
+                    fontSize:      fs,
+                    fontWeight:    FontWeight.w600,
+                    color:         fg,
+                    letterSpacing: _letterSpacing(),
                   ),
                 ),
                 if (widget.trailingIcon != null) ...[
-                  SizedBox(width: 8),
-                  Icon(widget.trailingIcon, size: _getIconSize(), color: widget.color,fontWeight: FontWeight.bold,),
+                  const SizedBox(width: 8),
+                  Icon(widget.trailingIcon, size: _iconSize(), color: fg),
                 ],
               ],
             ),
