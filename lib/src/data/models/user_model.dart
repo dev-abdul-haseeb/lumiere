@@ -30,4 +30,28 @@ class UserModel extends User {
       is_admin: is_admin ?? this.is_admin,
     );
   }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      user_id: '',
+      token: map['token'],
+      email: map['email'],
+      first_name: map['first_name'],
+      last_name: map['last_name'],
+      phone_number: map['phone_number'],
+      is_admin: map['is_admin'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'token': token,
+      'email': email,
+      'first_name': first_name,
+      'last_name': last_name,
+      'phone_number': phone_number,
+      'is_admin': is_admin,
+    };
+  }
+
 }

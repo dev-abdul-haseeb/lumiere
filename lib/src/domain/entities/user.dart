@@ -18,6 +18,25 @@ class User extends Equatable   {
     required this.is_admin,
   });
 
+  User copyWith({
+    String? user_id,
+    String? email,
+    String? token,
+    String? first_name,
+    String? last_name,
+    String? phone_number,
+    bool? is_admin,
+  }) {
+    return User(
+      user_id: user_id ?? this.user_id,
+      email: email ?? this.email,
+      token: token ?? this.token,
+      first_name: first_name ?? this.first_name,
+      last_name: last_name ?? this.last_name,
+      phone_number: phone_number ?? this.phone_number,
+      is_admin: is_admin ?? this.is_admin,
+    );
+  }
   @override
   List<Object?> get props => [user_id, email, token, first_name, last_name,phone_number, is_admin];
 }

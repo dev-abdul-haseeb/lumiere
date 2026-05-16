@@ -10,7 +10,9 @@ class Products extends Equatable {
   final int stock_quantity;
   final double cost_price;
   final double sale_price;
-  final String image_id;
+  final String image_link;
+  final bool isNewArrival;
+  final bool isFeatured;
 
   const Products({
     required this.productId,
@@ -22,20 +24,45 @@ class Products extends Equatable {
     required this.stock_quantity,
     required this.cost_price,
     required this.sale_price,
-    required this.image_id,
+    required this.image_link,
+    this.isNewArrival = false,
+    this.isFeatured = false,
   });
+
+  Products copyWith({
+    String? productId,
+    String? productName,
+    String? subtitle,
+    String? description,
+    String? category,
+    int? volume,
+    int? stock_quantity,
+    double? cost_price,
+    double? sale_price,
+    String? image_link,
+    bool? isNewArrival,
+    bool? isFeatured,
+  }) {
+    return Products(
+      productId:      productId      ?? this.productId,
+      productName:    productName    ?? this.productName,
+      subtitle:       subtitle       ?? this.subtitle,
+      description:    description    ?? this.description,
+      category:       category       ?? this.category,
+      volume:         volume         ?? this.volume,
+      stock_quantity: stock_quantity ?? this.stock_quantity,
+      cost_price:     cost_price     ?? this.cost_price,
+      sale_price:     sale_price     ?? this.sale_price,
+      image_link:     image_link     ?? this.image_link,
+      isNewArrival:   isNewArrival   ?? this.isNewArrival,
+      isFeatured:     isFeatured     ?? this.isFeatured,
+    );
+  }
 
   @override
   List<Object?> get props => [
-    productId,
-    productName,
-    subtitle,
-    description,
-    category,
-    volume,
-    stock_quantity,
-    cost_price,
-    sale_price,
-    image_id,
+    productId, productName, subtitle, description,
+    category, volume, stock_quantity, cost_price,
+    sale_price, image_link, isNewArrival, isFeatured,
   ];
 }

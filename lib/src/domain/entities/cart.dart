@@ -8,6 +8,17 @@ class Cart extends Equatable   {
     required this.user_id,
   });
 
+  Cart copyWith({
+    String? cart_id,
+    String? user_id,
+  }) {
+    return Cart(
+      cart_id: cart_id ?? this.cart_id,
+      user_id: user_id ?? this.user_id,
+    );
+  }
+
+
   @override
   List<Object?> get props => [cart_id, user_id];
 }
