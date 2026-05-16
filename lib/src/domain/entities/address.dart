@@ -14,6 +14,23 @@ class Address extends Equatable   {
     required this.country,
   });
 
+  Address copyWith({
+    String? address_id,
+    String? house,
+    String? street,
+    String? city,
+    String? country,
+  }) {
+    return Address(
+      address_id: address_id ?? this.address_id,
+      house: house ?? this.house,
+      street: street ?? this.street,
+      city: city ?? this.city,
+      country: country ?? this.country,
+    );
+  }
+
+
   @override
   List<Object?> get props => [address_id, house, street, city, country];
 }

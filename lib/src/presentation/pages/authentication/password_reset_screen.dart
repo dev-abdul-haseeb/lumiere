@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lumiere/src/core/constants/constants.dart';
 import 'package:lumiere/src/core/enum/enum.dart';
 import 'package:lumiere/src/core/theme/theme.dart';
 import 'package:lumiere/src/presentation/widgets/button.dart';
@@ -9,6 +10,7 @@ import 'package:lumiere/src/presentation/widgets/flash_bar.dart';
 import 'package:lumiere/src/presentation/widgets/textwidgets.dart';
 
 import '../../../domain/entities/user.dart';
+import '../../blocs/application/application_bloc.dart';
 import '../../blocs/auth/auth_bloc.dart';
 
 class PasswordResetScreen extends StatefulWidget {
@@ -74,7 +76,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ── Dark header ──────────────────────────────────────────────
+            // Dark header
             Padding(
               padding: EdgeInsets.only(
                 top: topPad + 20,
@@ -84,20 +86,27 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Logo mark
-                  Container(
-                    width: 36, height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: _highlight, width: 1.5),
-                    ),
-                    child: Center(
-                      child: Text('L',
-                        style: GoogleFonts.cormorantGaramond(
-                          fontSize: 18, fontWeight: FontWeight.w400,
-                          color: _highlight,
+                  BlocBuilder<ApplicationBloc, ApplicationState>(
+                    builder: (context, state) {
+                      final initial = state is ApplicationLoaded ? state.application.name[0].toUpperCase() : AppConstants.appName[0].toUpperCase();
+
+                      return Container(
+                        width: 36, height: 36,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: _highlight, width: 1.5),
                         ),
-                      ),
-                    ),
+                        child: Center(
+                          child: Text(
+                            initial,
+                            style: GoogleFonts.cormorantGaramond(
+                              fontSize: 18, fontWeight: FontWeight.w400,
+                              color: _highlight,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
 

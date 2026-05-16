@@ -4,6 +4,8 @@ import 'package:lumiere/src/core/enum/enum.dart';
 import 'package:lumiere/src/core/theme/theme.dart';
 
 import '../../routers/views.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lumiere/src/presentation/blocs/application/application_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   late Animation<double> _logoFade;
   late Animation<double> _textFade;
-  late Animation<double> _taglineFade;
+  late Animation<double> _subTitleFade;
   late Animation<double> _buttonFade;
   late Animation<double> _swipeFade;
   late Animation<Offset> _logoSlide;
@@ -31,16 +33,12 @@ class _SplashScreenState extends State<SplashScreen>
   double _dragOffset = 0.0;
   bool _isNavigating = false;
 
-  // Brand colours
   Color _bg = AppColors.get(appColors.background);
   Color _dark = AppColors.get(appColors.primary_action);
   Color _gold = AppColors.get(appColors.highlight);
   Color _olive = AppColors.get(appColors.accent_success);
   Color _muted = const Color(0xFF8A8070);
   Color _circle = const Color(0xFFDDD5C8);
-
-  /// Georgia with serif fallbacks for Windows / Linux
-  static const String _serif = 'Georgia, Times New Roman, serif';
 
   @override
   void initState() {
@@ -50,18 +48,15 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 2200),
     );
-
     _slideController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
     );
-
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
 
-    // Fade animations (staggered)
     _logoFade = CurvedAnimation(
       parent: _fadeController,
       curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
@@ -70,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _fadeController,
       curve: const Interval(0.25, 0.55, curve: Curves.easeOut),
     );
-    _taglineFade = CurvedAnimation(
+    _subTitleFade = CurvedAnimation(
       parent: _fadeController,
       curve: const Interval(0.45, 0.70, curve: Curves.easeOut),
     );
@@ -82,8 +77,6 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _fadeController,
       curve: const Interval(0.75, 1.0, curve: Curves.easeOut),
     );
-
-    // Slide-up animations
     _logoSlide = Tween<Offset>(
       begin: const Offset(0, 0.25),
       end: Offset.zero,
@@ -91,7 +84,6 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _slideController,
       curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
     ));
-
     _textSlide = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
@@ -99,13 +91,9 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _slideController,
       curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
     ));
-
-    // Arrow bounce
     _arrowBounce = Tween<double>(begin: 0.0, end: 6.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
-    // Circle subtle pulse
     _circleScale = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -125,10 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigateToNext() {
     if (_isNavigating) return;
     setState(() => _isNavigating = true);
-
-    // HapticFeedback is a no-op on desktop — safe to keep
     HapticFeedback.lightImpact();
-
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => const AuthWrapperScreen(),
@@ -139,9 +124,6 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  // ─── font helper ────────────────────────────────────────────────────────────
-  /// Returns a TextStyle using Georgia on mobile/web and falls back to
-  /// "Times New Roman" on desktop platforms where Georgia may be absent.
   TextStyle _ts({
     required double fontSize,
     FontWeight fontWeight = FontWeight.w400,
@@ -150,8 +132,6 @@ class _SplashScreenState extends State<SplashScreen>
     double? letterSpacing,
     double? height,
   }) {
-    // Flutter resolves fontFamily as a single string; list fallbacks via
-    // fontFamilyFallback instead.
     return TextStyle(
       fontFamily: 'Georgia',
       fontFamilyFallback: const ['Times New Roman', 'serif'],
@@ -166,241 +146,241 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bg,
-      // LayoutBuilder lets us respond to the actual rendered constraints
-      // (important for arbitrary Windows window sizes).
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final w = constraints.maxWidth;
-          final h = constraints.maxHeight;
+    return BlocBuilder<ApplicationBloc, ApplicationState>(
+      builder: (context, state) {
+        // Resolve dynamic fields — fall back to defaults while loading
+        final appName    = state is ApplicationLoaded ? state.application.name     : 'LUMIÈRE';
+        final subTitle   = state is ApplicationLoaded ? state.application.subTitle : 'LUXURY SKINCARE';
+        final tagLine    = state is ApplicationLoaded ? state.application.tagLine  : 'Crafted for skin that deserves\nnothing less than extraordinary';
 
-          // Clamp content width so it never looks absurd on wide monitors
-          final contentWidth = w.clamp(0.0, 520.0);
-          final xPad = (w - contentWidth) / 2;
+        return Scaffold(
+          backgroundColor: _bg,
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final w = constraints.maxWidth;
+              final h = constraints.maxHeight;
+              final contentWidth = w.clamp(0.0, 520.0);
 
-          return GestureDetector(
-            onVerticalDragUpdate: (details) {
-              if (details.delta.dy < 0) {
-                setState(() {
-                  _dragOffset -= details.delta.dy;
-                });
-              }
-            },
-            onVerticalDragEnd: (details) {
-              if (_dragOffset > 80 ||
-                  (details.velocity.pixelsPerSecond.dy < -600)) {
-                _navigateToNext();
-              } else {
-                setState(() => _dragOffset = 0);
-              }
-            },
-            child: AnimatedSlide(
-              offset: Offset(0, -(_dragOffset / h).clamp(0.0, 1.0)),
-              duration: _dragOffset == 0
-                  ? const Duration(milliseconds: 300)
-                  : Duration.zero,
-              curve: Curves.easeOut,
-              child: SizedBox(
-                width: w,
-                height: h,
-                child: Stack(
-                  children: [
-                    // ── Ambient background circle ──────────────────────────
-                    Positioned(
-                      top: h * 0.08,
-                      left: w * 0.5 - contentWidth * 0.42,
-                      child: ScaleTransition(
-                        scale: _circleScale,
-                        child: Container(
-                          width: contentWidth * 0.84,
-                          height: contentWidth * 0.84,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: _circle.withValues(alpha: 0.6),
-                              width: 1,
+              return GestureDetector(
+                onVerticalDragUpdate: (details) {
+                  if (details.delta.dy < 0) {
+                    setState(() => _dragOffset -= details.delta.dy);
+                  }
+                },
+                onVerticalDragEnd: (details) {
+                  if (_dragOffset > 80 ||
+                      details.velocity.pixelsPerSecond.dy < -600) {
+                    _navigateToNext();
+                  } else {
+                    setState(() => _dragOffset = 0);
+                  }
+                },
+                child: AnimatedSlide(
+                  offset: Offset(0, -(_dragOffset / h).clamp(0.0, 1.0)),
+                  duration: _dragOffset == 0
+                      ? const Duration(milliseconds: 300)
+                      : Duration.zero,
+                  curve: Curves.easeOut,
+                  child: SizedBox(
+                    width: w,
+                    height: h,
+                    child: Stack(
+                      children: [
+                        // Ambient background circle
+                        Positioned(
+                          top: h * 0.08,
+                          left: w * 0.5 - contentWidth * 0.42,
+                          child: ScaleTransition(
+                            scale: _circleScale,
+                            child: Container(
+                              width: contentWidth * 0.84,
+                              height: contentWidth * 0.84,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _circle.withValues(alpha: 0.6),
+                                  width: 1,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
 
-                    // ── Main content ───────────────────────────────────────
-                    Center(
-                      child: SizedBox(
-                        width: contentWidth,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(height: h * 0.04),
+                        // Main content
+                        Center(
+                          child: SizedBox(
+                            width: contentWidth,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(height: h * 0.04),
 
-                            // Logo mark
-                            FadeTransition(
-                              opacity: _logoFade,
-                              child: SlideTransition(
-                                position: _logoSlide,
-                                child: _LogoMark(size: contentWidth * 0.28),
-                              ),
-                            ),
-
-                            SizedBox(height: h * 0.038),
-
-                            // Brand name
-                            FadeTransition(
-                              opacity: _textFade,
-                              child: SlideTransition(
-                                position: _textSlide,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      'LUMIÈRE',
-                                      style: _ts(
-                                        fontSize: contentWidth * 0.115,
-                                        color: _dark,
-                                        letterSpacing: contentWidth * 0.022,
-                                        height: 1,
-                                      ),
-                                    ),
-                                    SizedBox(height: h * 0.012),
-                                    // Gold divider
-                                    Container(
-                                      width: contentWidth * 0.3,
-                                      height: 1,
-                                      color: _gold,
-                                    ),
-                                    SizedBox(height: h * 0.014),
-                                    Text(
-                                      'LUXURY SKINCARE',
-                                      style: _ts(
-                                        fontSize: contentWidth * 0.032,
-                                        color: _olive,
-                                        letterSpacing: contentWidth * 0.014,
-                                        height: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: h * 0.055),
-
-                            // Tagline
-                            FadeTransition(
-                              opacity: _taglineFade,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: contentWidth * 0.1),
-                                child: Text(
-                                  'Crafted for skin that deserves\nnothing less than extraordinary',
-                                  textAlign: TextAlign.center,
-                                  style: _ts(
-                                    fontSize: contentWidth * 0.042,
-                                    fontStyle: FontStyle.italic,
-                                    color: _dark.withValues(alpha: 0.75),
-                                    height: 1.55,
-                                    letterSpacing: 0.2,
+                                // Logo mark
+                                FadeTransition(
+                                  opacity: _logoFade,
+                                  child: SlideTransition(
+                                    position: _logoSlide,
+                                    child: _LogoMark(size: contentWidth * 0.28),
                                   ),
                                 ),
-                              ),
-                            ),
 
-                            SizedBox(height: h * 0.06),
+                                SizedBox(height: h * 0.038),
 
-                            // ── Enter button — pointer cursor on desktop ───
-                            FadeTransition(
-                              opacity: _buttonFade,
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  onTap: _navigateToNext,
-                                  child: Container(
-                                    width: contentWidth * 0.48,
-                                    height: h * 0.062,
-                                    decoration: BoxDecoration(
-                                      color: _dark,
-                                      borderRadius:
-                                      BorderRadius.circular(100),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'ENTER',
-                                      style: _ts(
-                                        fontSize: contentWidth * 0.038,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
-                                        letterSpacing: contentWidth * 0.018,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: h * 0.032),
-
-                            // ── Swipe / scroll hint ────────────────────────
-                            FadeTransition(
-                              opacity: _swipeFade,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'or swipe up',
-                                    style: _ts(
-                                      fontSize: contentWidth * 0.03,
-                                      fontStyle: FontStyle.italic,
-                                      color: _muted,
-                                      letterSpacing: 0.4,
-                                    ),
-                                  ),
-                                  SizedBox(height: h * 0.008),
-                                  AnimatedBuilder(
-                                    animation: _arrowBounce,
-                                    builder: (context, child) =>
-                                        Transform.translate(
-                                          offset: Offset(0, _arrowBounce.value),
-                                          child: child,
+                                // Brand name + subtitle
+                                FadeTransition(
+                                  opacity: _textFade,
+                                  child: SlideTransition(
+                                    position: _textSlide,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          appName.toUpperCase(),
+                                          style: _ts(
+                                            fontSize: contentWidth * 0.115,
+                                            color: _dark,
+                                            letterSpacing: contentWidth * 0.022,
+                                            height: 1,
+                                          ),
                                         ),
-                                    child: Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: _olive,
-                                      size: contentWidth * 0.06,
+                                        SizedBox(height: h * 0.012),
+                                        Container(
+                                          width: contentWidth * 0.3,
+                                          height: 1,
+                                          color: _gold,
+                                        ),
+                                        SizedBox(height: h * 0.014),
+                                        Text(
+                                          tagLine.toUpperCase(),
+                                          style: _ts(
+                                            fontSize: contentWidth * 0.032,
+                                            color: _olive,
+                                            letterSpacing: contentWidth * 0.014,
+                                            height: 1,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                                ),
 
-                    // ── EST. footer ────────────────────────────────────────
-                    Positioned(
-                      bottom: h * 0.045,
-                      left: 0,
-                      right: 0,
-                      child: FadeTransition(
-                        opacity: _swipeFade,
-                        child: Text(
-                          'EST. 2026  ·  PARIS',
-                          textAlign: TextAlign.center,
-                          style: _ts(
-                            fontSize: contentWidth * 0.028,
-                            color: _muted.withValues(alpha: 0.7),
-                            letterSpacing: contentWidth * 0.012,
+                                SizedBox(height: h * 0.055),
+
+                                // Tagline — from database
+                                FadeTransition(
+                                  opacity: _subTitleFade,
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: contentWidth * 0.1),
+                                    child: Text(
+                                      subTitle,
+                                      textAlign: TextAlign.center,
+                                      style: _ts(
+                                        fontSize: contentWidth * 0.042,
+                                        fontStyle: FontStyle.italic,
+                                        color: _dark.withValues(alpha: 0.75),
+                                        height: 1.55,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(height: h * 0.06),
+
+                                // Enter button
+                                FadeTransition(
+                                  opacity: _buttonFade,
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: _navigateToNext,
+                                      child: Container(
+                                        width: contentWidth * 0.48,
+                                        height: h * 0.062,
+                                        decoration: BoxDecoration(
+                                          color: _dark,
+                                          borderRadius: BorderRadius.circular(100),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'ENTER',
+                                          style: _ts(
+                                            fontSize: contentWidth * 0.038,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                            letterSpacing: contentWidth * 0.018,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(height: h * 0.032),
+
+                                // Swipe hint
+                                FadeTransition(
+                                  opacity: _swipeFade,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'or swipe up',
+                                        style: _ts(
+                                          fontSize: contentWidth * 0.03,
+                                          fontStyle: FontStyle.italic,
+                                          color: _muted,
+                                          letterSpacing: 0.4,
+                                        ),
+                                      ),
+                                      SizedBox(height: h * 0.008),
+                                      AnimatedBuilder(
+                                        animation: _arrowBounce,
+                                        builder: (context, child) =>
+                                            Transform.translate(
+                                              offset: Offset(0, _arrowBounce.value),
+                                              child: child,
+                                            ),
+                                        child: Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          color: _olive,
+                                          size: contentWidth * 0.06,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+
+                        // EST. footer
+                        Positioned(
+                          bottom: h * 0.045,
+                          left: 0,
+                          right: 0,
+                          child: FadeTransition(
+                            opacity: _swipeFade,
+                            child: Text(
+                              'EST. 2026  ·  PARIS',
+                              textAlign: TextAlign.center,
+                              style: _ts(
+                                fontSize: contentWidth * 0.028,
+                                color: _muted.withValues(alpha: 0.7),
+                                letterSpacing: contentWidth * 0.012,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

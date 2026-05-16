@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lumiere/src/core/constants/constants.dart';
 import 'package:lumiere/src/core/enum/enum.dart';
 import 'package:lumiere/src/core/theme/theme.dart';
 import 'package:lumiere/src/presentation/widgets/button.dart';
@@ -9,6 +10,7 @@ import 'package:lumiere/src/presentation/widgets/flash_bar.dart';
 import 'package:lumiere/src/presentation/widgets/textwidgets.dart';
 
 import '../../../domain/entities/user.dart';
+import '../../blocs/application/application_bloc.dart';
 import '../../blocs/auth/auth_bloc.dart';
 
 class DataEntryScreen extends StatefulWidget {
@@ -47,7 +49,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
     super.dispose();
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  // Submit
 
   void _onContinue() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -62,7 +64,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
     );
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
+  // Build
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +87,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ── Dark header ──────────────────────────────────────────────
+            // Dark header
             Padding(
               padding: EdgeInsets.only(
                 top: topPad + 20,
@@ -95,20 +97,27 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Logo mark
-                  Container(
-                    width: 36, height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: _highlight, width: 1.5),
-                    ),
-                    child: Center(
-                      child: Text('L',
-                        style: GoogleFonts.cormorantGaramond(
-                          fontSize: 18, fontWeight: FontWeight.w400,
-                          color: _highlight,
+                  BlocBuilder<ApplicationBloc, ApplicationState>(
+                    builder: (context, state) {
+                      final initial = state is ApplicationLoaded ? state.application.name[0].toUpperCase() : AppConstants.appName[0].toUpperCase();
+
+                      return Container(
+                        width: 36, height: 36,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: _highlight, width: 1.5),
                         ),
-                      ),
-                    ),
+                        child: Center(
+                          child: Text(
+                            initial,
+                            style: GoogleFonts.cormorantGaramond(
+                              fontSize: 18, fontWeight: FontWeight.w400,
+                              color: _highlight,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
 
@@ -129,7 +138,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
               ),
             ),
 
-            // ── Cream form section ───────────────────────────────────────
+            // Cream form section
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -200,7 +209,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
     );
   }
 
-  // ── Generic field ─────────────────────────────────────────────────────────
+  // Generic field
 
   Widget _buildField({
     required String label,
@@ -250,7 +259,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
     );
   }
 
-  // ── Phone field ───────────────────────────────────────────────────────────
+  // Phone field
 
   Widget _buildPhoneField() {
     return Column(
@@ -325,7 +334,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
     );
   }
 
-  // ── Continue button ───────────────────────────────────────────────────────
+  // Continue button
 
   Widget _buildContinueButton() {
     return BlocBuilder<AuthBloc, AuthState>(
@@ -346,7 +355,7 @@ class _DataEntryScreenState extends State<DataEntryScreen> {
     );
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // Helpers
 
   Widget _fieldLabel(String label) => AppText(
     label,

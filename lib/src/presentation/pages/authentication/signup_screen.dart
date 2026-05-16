@@ -9,6 +9,7 @@ import 'package:lumiere/src/presentation/widgets/textwidgets.dart';
 import 'package:lumiere/src/presentation/widgets/button.dart';
 import 'package:lumiere/src/presentation/widgets/flash_bar.dart';
 
+import '../../blocs/application/application_bloc.dart';
 import '../../blocs/auth/auth_bloc.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -209,68 +210,75 @@ class _SignupScreenState extends State<SignupScreen> {
   // Header
 
   Widget _buildHeader() {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 16,
-        left: 24,
-        right: 24,
-        bottom: 28,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<ApplicationBloc, ApplicationState>(
+      builder: (context, state) {
+        final appName = state is ApplicationLoaded ? state.application.name : AppConstants.appName;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 16,
+            left: 24,
+            right: 24,
+            bottom: 28,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Back button
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: Colors.white.withOpacity(0.2), width: 1),
-                  ),
-                  child: const Icon(Icons.chevron_left,
-                      color: Colors.white, size: 20),
-                ),
-              ),
-              // Logo mark
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: _highlight, width: 1.5),
-                ),
-                child: Center(
-                  child: Text('L',
-                    style: GoogleFonts.cormorantGaramond(
-                      fontSize: 18, fontWeight: FontWeight.w400,
-                      color: _highlight,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Back button
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      width: 36, height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.2), width: 1),
+                      ),
+                      child: const Icon(Icons.chevron_left,
+                          color: Colors.white, size: 20),
                     ),
                   ),
+                  // Logo mark
+                  Container(
+                    width: 36, height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: _highlight, width: 1.5),
+                    ),
+                    child: Center(
+                      child: Text(
+                        appName.isNotEmpty ? appName[0].toUpperCase() : 'L',
+                        style: GoogleFonts.cormorantGaramond(
+                          fontSize: 18, fontWeight: FontWeight.w400,
+                          color: _highlight,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Create your\naccount',
+                style: GoogleFonts.cormorantGaramond(
+                  fontSize: 40, fontWeight: FontWeight.w300,
+                  fontStyle: FontStyle.italic, color: Colors.white, height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Join the $appName family',
+                style: GoogleFonts.dmSans(
+                  fontSize: 13, color: _highlight, letterSpacing: 0.3,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          Text(
-            'Create your\naccount',
-            style: GoogleFonts.cormorantGaramond(
-              fontSize: 40, fontWeight: FontWeight.w300,
-              fontStyle: FontStyle.italic, color: Colors.white, height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Join the ${AppConstants.appName} family',
-            style: GoogleFonts.dmSans(
-              fontSize: 13, color: _highlight, letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

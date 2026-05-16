@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lumiere/src/core/constants/constants.dart';
 import 'package:lumiere/src/core/theme/theme.dart';
 import 'package:lumiere/src/core/enum/enum.dart';
 import 'package:lumiere/src/presentation/blocs/auth/auth_bloc.dart';
 
+import '../../../blocs/application/application_bloc.dart';
 import '../../../routers/views.dart';
 
 // PALETTE  (mirrors AppColors — kept local so this file is self-contained)
@@ -188,11 +190,16 @@ class _MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () => Scaffold.of(ctx).openDrawer(),
         ),
       ),
-      title: Text('LUMIÈRE',
-          style: GoogleFonts.dmSans(
-            fontSize: 14, fontWeight: FontWeight.w600,
-            color: _C.dark, letterSpacing: 3,
-          )),
+      title: BlocBuilder<ApplicationBloc, ApplicationState>(
+        builder: (context, state) {
+          final appName = state is ApplicationLoaded ? state.application.name.toUpperCase() : AppConstants.appName;
+          return Text(appName,
+              style: GoogleFonts.dmSans(
+                fontSize: 14, fontWeight: FontWeight.w600,
+                color: _C.dark, letterSpacing: 3,
+              ));
+        },
+      ),
       actions: [
         _NotificationBell(),
         const SizedBox(width: 12),
@@ -200,7 +207,6 @@ class _MobileAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-
 // SIDEBAR (persistent)
 
 class _Sidebar extends StatelessWidget {
@@ -273,24 +279,30 @@ class _SidebarContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Logo
+        // Logo
         const SizedBox(height: 36),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('LUMIÈRE',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 15, fontWeight: FontWeight.w600,
-                    color: Colors.white, letterSpacing: 3.5,
-                  )),
-              const SizedBox(height: 3),
-              Text('ADMIN PANEL',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 9, fontWeight: FontWeight.w400,
-                    color: _C.gold, letterSpacing: 2.5,
-                  )),
-            ],
+          child: BlocBuilder<ApplicationBloc, ApplicationState>(
+            builder: (context, state) {
+              final appName = state is ApplicationLoaded ? state.application.name.toUpperCase() : AppConstants.appName;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(appName,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 15, fontWeight: FontWeight.w600,
+                        color: Colors.white, letterSpacing: 3.5,
+                      )),
+                  const SizedBox(height: 3),
+                  Text('ADMIN PANEL',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 9, fontWeight: FontWeight.w400,
+                        color: _C.gold, letterSpacing: 2.5,
+                      )),
+                ],
+              );
+            },
           ),
         ),
         const SizedBox(height: 36),
